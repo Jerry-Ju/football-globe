@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import { Navigate, useNavigate, useParams } from "react-router-dom";
 import { motion } from "framer-motion";
 import { ArrowLeft, CalendarDays, MapPin, Quote } from "lucide-react";
@@ -18,7 +19,7 @@ import {
 import Flag from "../components/Flag";
 import PlayerAvatar from "../components/PlayerAvatar";
 import { Badge, GlowCard } from "../components/ui";
-import { PORTRAITS } from "../data/portraits";
+import { getPromoPhoto, PORTRAITS } from "../data/portraits";
 import {
   ABILITY_META,
   countryPlayers,
@@ -39,7 +40,10 @@ const tooltipStyle = {
 export default function PlayerPage() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const [imgFailed, setImgFailed] = useState(false);
   const player = id ? getPlayer(id) : undefined;
+
+  useEffect(() => setImgFailed(false), [id]);
 
   if (!player) return <Navigate to="/" replace />;
 
@@ -101,8 +105,10 @@ export default function PlayerPage() {
                   {player.number}
                 </span>
                 <img
-                  src={PORTRAITS[player.position]}
-                  alt={`${player.nameZh} 剪影`}
+                  key={player.id}
+                  src={imgFailed ? PORTRAITS[player.position] : getPromoPhoto(player)}
+                  onError={() => setImgFailed(true)}
+                  alt={`${player.nameZh} 宣传照`}
                   className="relative h-[420px] w-full object-cover object-top sm:h-[480px]"
                 />
                 {/* 底部信息 */}

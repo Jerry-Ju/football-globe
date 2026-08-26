@@ -2,9 +2,17 @@
  * 绿茵星图 · Football Globe — 数据模型 & Mock 数据
  * ============================================================ */
 
+import { EXTRA_COUNTRIES, FIFA_RANK_OF } from "./fifa100";
+
 export type Position = "FW" | "MF" | "DF" | "GK";
 export type Era = "现役" | "传奇";
-export type Confederation = "UEFA" | "CONMEBOL";
+export type Confederation =
+  | "UEFA"
+  | "CONMEBOL"
+  | "CONCACAF"
+  | "CAF"
+  | "AFC"
+  | "OFC";
 
 export interface Club {
   id: string;
@@ -68,6 +76,7 @@ export interface Country {
   id: string;
   name: string;
   nameZh: string;
+  code?: string; // FIFA 三字母代码（扩展国家用于旗帜徽章）
   lat: number;
   lng: number;
   fifaRank: number;
@@ -689,10 +698,10 @@ export const PLAYERS: Player[] = [
 ];
 
 /* ============================================================
- * 国家（14 个 · 带坐标与荣誉）
+ * 国家（13 个精选强国 + 87 个 FIFA 百强扩展国家）
  * ============================================================ */
 
-export const COUNTRIES: Country[] = [
+const FEATURED_COUNTRIES: Country[] = [
   {
     id: "brazil", name: "Brazil", nameZh: "巴西", lat: -10.3, lng: -53.2,
     fifaRank: 5, confed: "CONMEBOL", worldCups: 5, continentals: 9, continentalLabel: "美洲杯",
@@ -799,6 +808,18 @@ export const COUNTRIES: Country[] = [
   },
 ];
 
+/* 合并：精选国家应用最新排名 + FIFA 百强扩展国家 */
+export const COUNTRIES: Country[] = [
+  ...FEATURED_COUNTRIES.map((c) => ({
+    ...c,
+    fifaRank: FIFA_RANK_OF[c.id] ?? c.fifaRank,
+  })),
+  ...EXTRA_COUNTRIES,
+];
+
+/** 是否精选国家（收录了球星档案） */
+export const isFeatured = (c: Country) => c.playerIds.length > 0;
+
 /* ============================================================
  * 索引与排行榜工具
  * ============================================================ */
@@ -875,20 +896,25 @@ export function ratingTicker(limit = 16): Player[] {
   return [...PLAYERS].sort((a, b) => b.rating - a.rating).slice(0, limit);
 }
 
-/* 地球节点视觉参数 */
+/* 地球节点视觉参数（三级节点：冠军金 / 精选绿 / 百强蓝） */
 export function countryAltitude(c: Country): number {
-  return 0.022 + c.worldCups * 0.011 + Math.max(0, 20 - c.fifaRank) * 0.0006;
+  if (isFeatured(c))
+    return 0.022 + c.worldCups * 0.011 + Math.max(0, 20 - c.fifaRank) * 0.0006;
+  return 0.012 + Math.max(0, 30 - c.fifaRank) * 0.0004;
 }
 export function countryRadius(c: Country): number {
-  return 0.32 + c.worldCups * 0.075;
+  if (isFeatured(c)) return 0.34 + c.worldCups * 0.08;
+  return 0.1 + Math.max(0, 40 - c.fifaRank) * 0.0016; // 排名越高越大
 }
 export function countryColor(c: Country): string {
-  return c.worldCups > 0 ? "#F59E0B" : "#10B981";
+  if (c.worldCups > 0) return "#F59E0B";
+  return isFeatured(c) ? "#10B981" : "#38BDF8";
 }
 
 /* 全局统计 */
 export const GLOBAL_STATS = {
   countries: COUNTRIES.length,
+  featuredCountries: FEATURED_COUNTRIES.length,
   players: PLAYERS.length,
   clubs: CLUBS.length,
   worldCups: COUNTRIES.reduce((s, c) => s + c.worldCups, 0),

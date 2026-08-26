@@ -1,4 +1,6 @@
-/* 手绘 SVG 国旗（13 国 · 简化几何版） */
+/* 手绘 SVG 国旗（13 精选国 · 简化几何版）+ 百强国家自动主题徽章 */
+
+import { COUNTRY_MAP } from "../data/db";
 
 function flagArt(id: string) {
   switch (id) {
@@ -125,8 +127,30 @@ function flagArt(id: string) {
           <rect y="16" width="60" height="8" fill="#BA0C2F" />
         </>
       );
-    default:
-      return <rect width="60" height="40" fill="#1a2438" />;
+    default: {
+      const c = COUNTRY_MAP[id];
+      const [t1, t2] = c?.theme ?? ["#1a2438", "#334155"];
+      return (
+        <>
+          <rect width="60" height="40" fill={t1} />
+          <polygon points="60,0 60,40 0,40" fill={t2} />
+          <polygon points="0,0 60,0 0,40" fill="#ffffff" opacity="0.08" />
+          <rect x="12" y="11" width="36" height="18" rx="3.5" fill="rgba(7,11,19,0.55)" />
+          <text
+            x="30"
+            y="24"
+            textAnchor="middle"
+            fontSize="10.5"
+            fontWeight="800"
+            fontFamily="'Orbitron', sans-serif"
+            fill="#F8FAFC"
+            letterSpacing="1"
+          >
+            {c?.code ?? "·"}
+          </text>
+        </>
+      );
+    }
   }
 }
 

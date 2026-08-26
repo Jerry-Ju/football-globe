@@ -6,6 +6,7 @@ import {
   countryAltitude,
   countryColor,
   countryRadius,
+  isFeatured,
 } from "../data/db";
 import type { Country } from "../data/db";
 
@@ -106,10 +107,14 @@ export default function GlobeSection({
       </div>
       <div style="margin-top:6px;font-size:11px;color:#94a3b8;display:flex;gap:12px;">
         <span>FIFA <b style="color:#fcd34d;">#${c.fifaRank}</b></span>
-        <span>世界杯 <b style="color:#fcd34d;">×${c.worldCups}</b></span>
-        <span>球星 <b style="color:#6ee7b7;">${c.playerIds.length}</b></span>
+        ${
+          isFeatured(c)
+            ? `<span>世界杯 <b style="color:#fcd34d;">×${c.worldCups}</b></span>
+               <span>球星 <b style="color:#6ee7b7;">${c.playerIds.length}</b></span>`
+            : `<span>${c.confed}</span><span style="color:#64748b;">百强节点</span>`
+        }
       </div>
-      <div style="margin-top:8px;font-size:10px;color:#34d399;letter-spacing:0.1em;">▸ 点击查看国家名片</div>
+      <div style="margin-top:8px;font-size:10px;color:${isFeatured(c) ? "#34d399" : "#7dd3fc"};letter-spacing:0.1em;">▸ 点击查看国家名片</div>
     </div>`;
   };
 
@@ -157,7 +162,8 @@ export default function GlobeSection({
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           ringColor={((obj: object) => {
             const c = obj as Country;
-            const rgb = c.worldCups > 0 ? "245,158,11" : "16,185,129";
+            const rgb =
+              c.worldCups > 0 ? "245,158,11" : isFeatured(c) ? "16,185,129" : "56,189,248";
             return (t: number) => `rgba(${rgb},${Math.pow(1 - t, 1.7) * 0.9})`;
           }) as any}
         />

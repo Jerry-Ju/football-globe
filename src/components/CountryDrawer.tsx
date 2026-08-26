@@ -7,13 +7,16 @@ import PlayerAvatar from "./PlayerAvatar";
 import { PillTabs, Badge } from "./ui";
 import { countryClubs, countryPlayers, getClub } from "../data/db";
 import type { Country } from "../data/db";
+import { FEATURED_PICKS } from "../data/picks";
 
 export default function CountryDrawer({
   country,
   onClose,
+  onSelectCountry,
 }: {
   country: Country | null;
   onClose: () => void;
+  onSelectCountry?: (c: Country) => void;
 }) {
   const navigate = useNavigate();
   const [tab, setTab] = useState("players");
@@ -84,9 +87,11 @@ export default function CountryDrawer({
                     <Trophy size={11} /> 世界杯 ×{country.worldCups}
                   </Badge>
                 )}
-                <Badge tone="green">
-                  球星 {country.playerIds.length}
-                </Badge>
+                {country.playerIds.length > 0 ? (
+                  <Badge tone="green">球星 {country.playerIds.length}</Badge>
+                ) : (
+                  <Badge tone="slate">球星档案收录中</Badge>
+                )}
               </div>
 
               <p className="mt-4 border-l-2 border-turf-500/60 pl-3 text-xs leading-relaxed text-slate-400">
@@ -129,8 +134,8 @@ export default function CountryDrawer({
               <PillTabs
                 id={`drawer-${country.id}`}
                 items={[
-                  { id: "players", label: "Top 球星", count: country.playerIds.length },
-                  { id: "clubs", label: "顶级俱乐部", count: country.clubIds.length },
+                  { id: "players", label: "Top 球星", count: country.playerIds.length || undefined },
+                  { id: "clubs", label: "顶级俱乐部", count: country.clubIds.length || undefined },
                 ]}
                 active={tab}
                 onChange={setTab}
@@ -148,6 +153,37 @@ export default function CountryDrawer({
                     exit={{ opacity: 0, y: -8 }}
                     transition={{ duration: 0.22 }}
                   >
+                    {countryPlayers(country).length === 0 ? (
+                      <div className="flex flex-col items-center rounded-xl border border-dashed border-white/12 px-6 py-10 text-center">
+                        <span className="relative flex h-14 w-14 items-center justify-center rounded-full border border-turf-500/25 bg-turf-500/[0.06]">
+                          <span className="absolute inset-0 animate-pulse-dot rounded-full border border-turf-500/20" />
+                          <Trophy size={22} className="text-turf-400" />
+                        </span>
+                        <p className="mt-4 text-sm font-bold text-slate-200">
+                          {country.nameZh}的球星档案正在收录
+                        </p>
+                        <p className="mt-2 max-w-[16rem] text-xs leading-relaxed text-slate-500">
+                          星图已标记 {country.nameZh} 的 FIFA 排名与坐标，
+                          完整球星档案即将点亮这颗节点。
+                        </p>
+                        <p className="mt-6 text-[10px] font-bold tracking-[0.28em] text-slate-500 uppercase">
+                          先看精选国家
+                        </p>
+                        <div className="mt-3 flex flex-wrap justify-center gap-2">
+                          {FEATURED_PICKS.map((c) => (
+                            <button
+                              key={c.id}
+                              onClick={() => onSelectCountry?.(c)}
+                              className="flex cursor-pointer items-center gap-2 rounded-full border border-white/10 bg-white/[0.03] py-1.5 pr-3.5 pl-1.5 text-xs font-semibold text-slate-300 transition-all hover:-translate-y-0.5 hover:border-turf-500/45 hover:text-turf-300"
+                            >
+                              <Flag id={c.id} className="h-4 w-6 rounded-[2px]" />
+                              {c.nameZh}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    ) : (
+                      <>
                     <div className="no-scrollbar flex gap-3 overflow-x-auto pb-3">
                       {countryPlayers(country).map((p, i) => {
                         const club = getClub(p.clubId);
@@ -227,6 +263,8 @@ export default function CountryDrawer({
                         );
                       })}
                     </div>
+                      </>
+                    )}
                   </motion.div>
                 ) : (
                   <motion.div

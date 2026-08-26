@@ -14,7 +14,7 @@ import CountryDrawer from "../components/CountryDrawer";
 import RankingsPanel from "../components/RankingsPanel";
 import Flag from "../components/Flag";
 import { GlowCard, SectionHead } from "../components/ui";
-import { COUNTRIES, GLOBAL_STATS, ratingTicker } from "../data/db";
+import { COUNTRIES, GLOBAL_STATS, isFeatured, ratingTicker } from "../data/db";
 import type { Country } from "../data/db";
 
 function HudCorners() {
@@ -65,8 +65,10 @@ export default function Home() {
                 <span className="text-turf-300 text-glow-green">装下整部足球史</span>
               </h1>
               <p className="mt-5 max-w-md text-sm leading-relaxed text-slate-400">
-                球体上的发光节点代表 {GLOBAL_STATS.countries} 个足球强国。
-                点击任意节点，翻开这个国家的世界杯、传奇球星与顶级俱乐部。
+                球体上的 {GLOBAL_STATS.countries} 个发光节点覆盖 FIFA 最新百强：
+                <span className="text-golden-300">金色</span>是世界杯冠军国，
+                <span className="text-turf-300">绿色</span>是收录球星档案的精选强国，
+                <span className="text-sky-300">蓝色</span>是其余百强节点。点击任意节点翻开国家名片。
               </p>
               <div className="pointer-events-auto mt-7 flex flex-wrap items-center gap-3">
                 <button
@@ -98,9 +100,9 @@ export default function Home() {
             className="absolute top-24 right-5 hidden flex-col items-end gap-2 md:flex sm:top-28 sm:right-10"
           >
             {[
-              { v: GLOBAL_STATS.countries, label: "国家节点" },
+              { v: GLOBAL_STATS.countries, label: "FIFA 百强节点" },
+              { v: GLOBAL_STATS.featuredCountries, label: "精选强国" },
               { v: GLOBAL_STATS.players, label: "传奇球星" },
-              { v: GLOBAL_STATS.clubs, label: "顶级俱乐部" },
               { v: GLOBAL_STATS.worldCups, label: "世界杯总数" },
             ].map((s) => (
               <div
@@ -127,13 +129,16 @@ export default function Home() {
             </p>
             <p className="flex items-center gap-2.5">
               <span className="h-2.5 w-2.5 rounded-full bg-golden-500 shadow-[0_0_10px_#f59e0b]" />
-              捧起过世界杯的国家
+              捧起过世界杯的冠军国
             </p>
             <p className="flex items-center gap-2.5">
               <span className="h-2.5 w-2.5 rounded-full bg-turf-500 shadow-[0_0_10px_#10b981]" />
-              足球强国节点
+              收录球星档案的精选强国
             </p>
-            <p className="text-slate-600">节点大小 = 足球底蕴（世界杯 + FIFA 排名）</p>
+            <p className="flex items-center gap-2.5">
+              <span className="h-2.5 w-2.5 rounded-full bg-sky-400 shadow-[0_0_10px_#38bdf8]" />
+              FIFA 百强节点（越大排名越高）
+            </p>
           </div>
 
           {/* 右下操作提示 */}
@@ -193,11 +198,13 @@ export default function Home() {
             <SectionHead
               eyebrow="Nations"
               title="选择你的主队"
-              desc="13 面旗帜，13 种足球信仰。点击任意国家，直接翻开它的星图名片。"
+              desc={`${GLOBAL_STATS.featuredCountries} 个精选强国率先收录完整球星档案，其余 ${
+                GLOBAL_STATS.countries - GLOBAL_STATS.featuredCountries
+              } 个 FIFA 百强国家都在星图之上。点击任意国家，直接翻开它的国家名片。`}
             />
           </motion.div>
           <div className="no-scrollbar -mx-1 flex gap-3 overflow-x-auto px-1 pb-2">
-            {COUNTRIES.map((c, i) => (
+            {COUNTRIES.filter(isFeatured).map((c, i) => (
               <motion.button
                 key={c.id}
                 initial={{ opacity: 0, y: 20 }}
@@ -223,6 +230,16 @@ export default function Home() {
                 </div>
               </motion.button>
             ))}
+            <div className="flex w-[10rem] shrink-0 flex-col items-center justify-center rounded-xl border border-dashed border-sky-400/25 bg-sky-400/[0.04] p-4 text-center">
+              <span className="tabular font-display text-xl font-extrabold text-sky-300">
+                +{GLOBAL_STATS.countries - GLOBAL_STATS.featuredCountries}
+              </span>
+              <span className="mt-1.5 text-[10px] leading-relaxed tracking-widest text-slate-500">
+                其余 FIFA 百强
+                <br />
+                尽在 3D 星图
+              </span>
+            </div>
           </div>
         </div>
       </section>
@@ -271,7 +288,11 @@ export default function Home() {
         </div>
       </section>
 
-      <CountryDrawer country={selected} onClose={() => setSelected(null)} />
+      <CountryDrawer
+        country={selected}
+        onClose={() => setSelected(null)}
+        onSelectCountry={setSelected}
+      />
     </div>
   );
 }

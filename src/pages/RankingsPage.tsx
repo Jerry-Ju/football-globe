@@ -47,7 +47,7 @@ export default function RankingsPage() {
         >
           {[
             { icon: <Users size={16} />, v: GLOBAL_STATS.players, label: "收录球星" },
-            { icon: <Globe2 size={16} />, v: GLOBAL_STATS.countries, label: "足球强国" },
+            { icon: <Globe2 size={16} />, v: GLOBAL_STATS.countries, label: "百强国家" },
             { icon: <Trophy size={16} />, v: GLOBAL_STATS.worldCups, label: "世界杯总数" },
           ].map((s) => (
             <div
