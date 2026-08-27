@@ -1,0 +1,175 @@
+@import "tailwindcss";
+
+@theme {
+  --color-pitch-950: #070b13;
+  --color-pitch-900: #0b0f19;
+  --color-pitch-800: #10172a;
+  --color-pitch-700: #1a2438;
+  --color-pitch-600: #24324c;
+  --color-turf-300: #6ee7b7;
+  --color-turf-400: #34d399;
+  --color-turf-500: #10b981;
+  --color-turf-600: #059669;
+  --color-golden-300: #fcd34d;
+  --color-golden-400: #fbbf24;
+  --color-golden-500: #f59e0b;
+  --color-golden-600: #d97706;
+
+  --font-display: "Orbitron", "Noto Sans SC", sans-serif;
+  --font-body: "Manrope", "Noto Sans SC", sans-serif;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: var(--color-pitch-900);
+  color: #e2e8f0;
+  font-family: var(--font-body);
+  overflow-x: hidden;
+}
+
+::selection {
+  background: rgba(16, 185, 129, 0.35);
+  color: #ecfdf5;
+}
+
+/* ---------- 自定义滚动条 ---------- */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #0b0f19;
+}
+::-webkit-scrollbar-thumb {
+  background: #1a2438;
+  border-radius: 8px;
+  border: 2px solid #0b0f19;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #10b981;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  scrollbar-width: none;
+}
+
+/* ---------- 质感工具类 ---------- */
+.glass {
+  background: rgba(16, 23, 42, 0.55);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(110, 231, 183, 0.12);
+}
+
+.glass-deep {
+  background: rgba(9, 13, 23, 0.78);
+  backdrop-filter: blur(22px);
+  -webkit-backdrop-filter: blur(22px);
+  border: 1px solid rgba(110, 231, 183, 0.14);
+}
+
+.border-glow {
+  box-shadow:
+    0 0 0 1px rgba(16, 185, 129, 0.14),
+    0 0 24px rgba(16, 185, 129, 0.1),
+    inset 0 0 24px rgba(16, 185, 129, 0.03);
+}
+
+.border-glow-gold {
+  box-shadow:
+    0 0 0 1px rgba(245, 158, 11, 0.18),
+    0 0 26px rgba(245, 158, 11, 0.12),
+    inset 0 0 22px rgba(245, 158, 11, 0.04);
+}
+
+.text-glow-green {
+  text-shadow: 0 0 18px rgba(16, 185, 129, 0.55), 0 0 46px rgba(16, 185, 129, 0.25);
+}
+.text-glow-gold {
+  text-shadow: 0 0 18px rgba(245, 158, 11, 0.55), 0 0 46px rgba(245, 158, 11, 0.22);
+}
+
+/* 网格背景 */
+.grid-lines {
+  background-image:
+    linear-gradient(rgba(110, 231, 183, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(110, 231, 183, 0.05) 1px, transparent 1px);
+  background-size: 44px 44px;
+}
+
+/* 扫描线覆盖层 */
+.scanlines::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: repeating-linear-gradient(
+    0deg,
+    rgba(110, 231, 183, 0.05) 0px,
+    rgba(110, 231, 183, 0.05) 1px,
+    transparent 1px,
+    transparent 4px
+  );
+  mix-blend-mode: overlay;
+}
+
+/* 跑马灯 */
+@keyframes marquee-x {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+.animate-marquee {
+  animation: marquee-x 42s linear infinite;
+}
+.animate-marquee:hover {
+  animation-play-state: paused;
+}
+
+/* 慢速旋转 */
+@keyframes spin-slow {
+  to {
+    transform: rotate(360deg);
+  }
+}
+.animate-spin-slow {
+  animation: spin-slow 26s linear infinite;
+}
+
+/* 呼吸脉冲 */
+@keyframes pulse-dot {
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.45;
+    transform: scale(0.72);
+  }
+}
+.animate-pulse-dot {
+  animation: pulse-dot 1.8s ease-in-out infinite;
+}
+
+/* globe 容器内 canvas 抓取手势 */
+.globe-canvas canvas {
+  cursor: grab;
+}
+.globe-canvas canvas:active {
+  cursor: grabbing;
+}
+
+/* 数字字体对齐 */
+.tabular {
+  font-variant-numeric: tabular-nums;
+}
